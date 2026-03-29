@@ -8,6 +8,7 @@ const ItemSchema = new mongoose.Schema({
   location: { type: String },
   imageUrl: { type: String },
   userId: { type: String, required: true, index: true },
+  status: { type: String, enum: ['not-delivered', 'delivered'], default: 'not-delivered' },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Item', ItemSchema);

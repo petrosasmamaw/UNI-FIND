@@ -26,4 +26,27 @@ const getItems = async ({ type, category, search, page = 1, limit = 20, userId }
 
 const getItemById = async (id) => Item.findById(id).lean();
 
-module.exports = { createItem, getItems, getItemById };
+const updateItemStatus = async (itemId, userId, status) => {
+  // First, verify the item exists and user is the creator
+  const item = await Item.findById(itemId);
+  if (!item) {
+    throw new Error('Item not found');
+  }
+  if (item.userId !== userId) {
+    throw new Error('Unauthorized: Only item creator can update status');
+  }
+  
+  // Validate status value
+  if (!['not-delivered', 'delivered'].includes(status)) {
+    throw new Error('Invalid status value');
+  }
+  
+  // Update and return the item
+  return Item.findByIdAndUpdate(
+    itemId,
+    { status },
+    { new: true }
+  ).lean();
+};
+
+module.exports = { createItem, getItems, getItemById, updateItemStatus };

@@ -94,4 +94,39 @@ const getItem = async (req, res) => {
   }
 };
 
-module.exports = { createItem, getItems, getItem };
+const updateItemStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const userId = req.body.userId || (req.user && req.user.id);
+
+    if (!userId) {
+      return res.status(400).json({ message: 'Missing userId. Ensure you are logged in.' });
+    }
+
+    if (!status) {
+      return res.status(400).json({ message: 'status field is required' });
+    }
+
+    const updatedItem = await itemService.updateItemStatus(id, userId, status);
+    return res.json(updatedItem);
+  } catch (err) {
+    console.error('Error updating item status:', err);
+    
+    if (err.message.includes('not found')) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
+    
+    if (err.message.includes('Unauthorized')) {
+      return res.status(403).json({ message: 'Unauthorized: Only item creator can update status' });
+    }
+    
+    if (err.message.includes('Invalid status')) {
+      return res.status(400).json({ message: 'Invalid status value' });
+    }
+
+    return res.status(500).json({ message: 'Failed to update item status', details: err.message });
+  }
+};
+
+module.exports = { createItem, getItems, getItem, updateItemStatus };
