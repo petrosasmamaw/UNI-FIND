@@ -21,6 +21,8 @@ const getRoomsForUser = async (userId) => {
   return Room.find({ participants: userId }).populate('itemId').sort({ updatedAt: -1 }).lean();
 };
 
-module.exports = { findRoomForItemAndUsers, createRoom, getRoomById, getRoomsForUser };
+const getRoomsByItemId = async (itemId) => {
+  return Room.find({ itemId }).populate('itemId').sort({ updatedAt: -1 }).lean();
+};
 
-module.exports = { findRoomForItemAndUsers, createRoom, getRoomById, getRoomsForUser };
+module.exports = { findRoomForItemAndUsers, createRoom, getRoomById, getRoomsForUser, getRoomsByItemId };

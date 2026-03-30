@@ -35,4 +35,20 @@ const listRoomsForUser = async (req, res) => {
   res.json(rooms);
 };
 
-module.exports = { getOrCreateRoom, getRoom, listRoomsForUser };
+const getRoomsForItem = async (req, res) => {
+  const { itemId } = req.params;
+  if (!itemId) return res.status(400).json({ message: 'itemId required' });
+
+  try {
+    const item = await itemService.getItemById(itemId);
+    if (!item) return res.status(404).json({ message: 'Item not found' });
+
+    const rooms = await roomService.getRoomsByItemId(itemId);
+    res.json(rooms);
+  } catch (err) {
+    console.error('Error fetching rooms for item:', err);
+    res.status(500).json({ message: 'Failed to fetch rooms', details: err.message });
+  }
+};
+
+module.exports = { getOrCreateRoom, getRoom, listRoomsForUser, getRoomsForItem };
